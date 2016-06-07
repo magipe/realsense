@@ -165,6 +165,8 @@ private:
   std::map<std::string, std::string> config_;
   int stream_step_[STREAM_COUNT];
 
+  float depth_scale_;
+
   struct CameraOptions
   {
     rs_option opt;

@@ -132,6 +132,9 @@ namespace realsense_camera
     }
 
     dynamic_reconf_server_->setCallback(boost::bind(&RealsenseNodelet::configCallback, this, _1, _2));
+
+    depth_scale_ = rs_get_device_depth_scale(rs_device_, &rs_error_);
+    depth_scale_ *= 1000.0;
 }
 
   /*
@@ -678,6 +681,7 @@ namespace realsense_camera
    */
   void RealsenseNodelet::prepareStreamData(rs_stream rs_strm)
   {
+    cv::Mat image_scaled;
     switch (rs_strm)
     {
       case RS_STREAM_COLOR:
@@ -685,7 +689,8 @@ namespace realsense_camera
       break;
       case RS_STREAM_DEPTH:
       image_depth16_ = reinterpret_cast <const uint16_t * >(rs_get_frame_data(rs_device_, RS_STREAM_DEPTH, 0));
-      image_[(uint32_t) RS_STREAM_DEPTH].data = (unsigned char *) image_depth16_;
+      image_scaled = Mat(image_[(uint32_t) RS_STREAM_DEPTH].size(), CV_16UC1, (void *) image_depth16_, depth_width_ * sizeof(uint16_t));
+      image_scaled.convertTo(image_[(uint32_t) RS_STREAM_DEPTH], CV_16UC1, depth_scale_);
       break;
       case RS_STREAM_INFRARED:
       image_[(uint32_t) RS_STREAM_INFRARED].data =
@@ -871,6 +876,7 @@ namespace realsense_camera
       float depth_point[3], color_point[3], color_pixel[2], scaled_depth;
       unsigned char *color_data = image_color.data;
       const float depth_scale = rs_get_device_depth_scale(rs_device_, &rs_error_);
+
       checkError();// Default value is 0.001
 
       // Fill the PointCloud2 fields.
