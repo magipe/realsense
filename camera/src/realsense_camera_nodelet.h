@@ -87,6 +87,7 @@ public:
   const bool ENABLE_COLOR = true;
   const bool ENABLE_PC = true;
   const bool ENABLE_TF = true;
+  const bool DEPTH_REGISTRATION = true;
   const rs_format DEPTH_FORMAT = RS_FORMAT_Z16;
   const rs_format COLOR_FORMAT = RS_FORMAT_RGB8;
   const rs_format IR1_FORMAT = RS_FORMAT_Y8;
@@ -103,9 +104,10 @@ public:
   const char *IR1_TOPIC = "camera/infrared1/image_raw";
   const char *IR2_TOPIC = "camera/infrared2/image_raw";
   const char *PC_TOPIC = "camera/depth/points";
+  const char *DEPTH_REGISTERED_TOPIC = "camera/depth_registered/image"; 
   const char *SETTINGS_SERVICE = "camera/get_settings";
   const char *R200 = "R200";
-  const static int STREAM_COUNT = 4;
+  const static int STREAM_COUNT = 10;
 
 private:
   // Member Variables.
@@ -130,6 +132,7 @@ private:
   bool enable_depth_;
   bool enable_pointcloud_;
   bool enable_tf_;
+  bool depth_registration_;
   std::string base_frame_id_;
   std::string depth_frame_id_;
   std::string color_frame_id_;
@@ -139,6 +142,7 @@ private:
   std::string ir2_frame_id_;
   std::string camera_ = "R200";
   const uint16_t *image_depth16_;
+  const uint16_t *image_depth_registered16_;
 
   cv::Mat image_[STREAM_COUNT];
 
@@ -178,6 +182,7 @@ private:
   // Member Functions.
   void enableColorStream();
   void enableDepthStream();
+  void enableDepthRegisteredStream();
   void enableInfraredStream();
   void enableInfrared2Stream();
   void checkError();
